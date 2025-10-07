@@ -1,0 +1,83 @@
+/* LoginForm.css */
+
+body {
+    background: #f5f7fa;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+form {
+    width: 380px;
+    padding: 45px 40px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 30px;
+    color: #2d3436;
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+input {
+    width: 100%;
+    padding: 13px 15px;
+    margin-bottom: 22px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    background: #4a90e2;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.25s ease;
+}
+
+button:hover {
+    background: #357abd;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.register-text {
+    margin-top: 20px;
+    color: #636e72;
+    font-size: 0.95rem;
+}
+
+.register-link {
+    color: #0984e3;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.register-link:hover {
+    color: #6c5ce7;
+    text-decoration: underline;
+}

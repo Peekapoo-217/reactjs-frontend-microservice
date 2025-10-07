@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { register } from "../routes/auth-client";
 import { useNavigate } from "react-router-dom";
+import "./LoginForm.css"; // dùng lại CSS của login form
 
 export default function RegisterForm() {
     const [email, setEmail] = useState("");
@@ -11,11 +12,12 @@ export default function RegisterForm() {
         e.preventDefault();
         try {
             await register(email, password);
-            alert("Đăng ký thành công!");
-            navigate("/login");
+            alert("Đăng ký thành công! ");
+            // Thêm delay nhẹ 1s cho người dùng kịp thấy alert
+            setTimeout(() => navigate("/login"), 800);
         } catch (error) {
             console.error("Register failed:", error.response?.data);
-            alert("Đăng ký thất bại!");
+            alert("Đăng ký thất bại, vui lòng thử lại!");
         }
     };
 
@@ -27,12 +29,14 @@ export default function RegisterForm() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
             />
             <input
                 type="password"
                 placeholder="Mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
             />
             <button type="submit">Register</button>
         </form>

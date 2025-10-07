@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../routes/auth-client";
 import { useNavigate } from "react-router-dom";
+import "./LoginForm.css";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -37,6 +38,16 @@ export default function LoginForm() {
             />
             <br />
             <button type="submit">Login</button>
+
+            <p className="register-text">
+                Chưa có tài khoản?{" "}
+                <span
+                    className="register-link"
+                    onClick={() => navigate("/register")}
+                >
+                    Đăng ký ngay
+                </span>
+            </p>
         </form>
     );
 }
