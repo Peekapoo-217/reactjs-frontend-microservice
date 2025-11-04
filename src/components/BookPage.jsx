@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 import "./BookPage.css";
 
 export default function BooksPage() {
@@ -11,7 +12,7 @@ export default function BooksPage() {
 
     const fetchBooks = async () => {
         try {
-            const res = await axios.get("http://localhost:3002/books/display");
+            const res = await axios.get(API_ENDPOINTS.BOOKS.DISPLAY);
             setBooks(res.data);
         } catch (error) {
             console.error("Không thể tải danh sách sách:", error);
@@ -27,7 +28,7 @@ export default function BooksPage() {
 
         try {
             await axios.post(
-                "http://localhost:3003/borrows/create",
+                API_ENDPOINTS.BORROWS.CREATE,
                 { bookId },
                 {
                     headers: { Authorization: `Bearer ${token}` },
