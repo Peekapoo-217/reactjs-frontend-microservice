@@ -1,9 +1,7 @@
-// src/routes/auth-client.js
-import axios from "axios";
-import { API_ENDPOINTS } from "../config/api";
+import axios from "../utils/axios";
 
 export const login = async (email, password) => {
-    const response = await axios.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
+    const response = await axios.post('/auth/login', { email, password });
 
     if (response.data.access_token) {
         localStorage.setItem("token", response.data.access_token);
@@ -12,7 +10,7 @@ export const login = async (email, password) => {
 };
 
 export const register = async (email, password) => {
-    const response = await axios.post(API_ENDPOINTS.AUTH.REGISTER, { email, password });
+    const response = await axios.post('/auth/register', { email, password });
     return response.data;
 };
 

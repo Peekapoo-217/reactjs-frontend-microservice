@@ -15,8 +15,7 @@ export default function LoginForm() {
             alert("Đăng nhập thành công!");
             navigate("/home");
         } catch (error) {
-            console.error("Login failed:", error.response?.data);
-            alert("Sai tài khoản hoặc mật khẩu!");
+            alert("Sai tài khoản hoặc mật khẩu! Vui lòng đăng ký trước.");
         }
     };
 

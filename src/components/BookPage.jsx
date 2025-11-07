@@ -1,43 +1,102 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { API_ENDPOINTS } from "../config/api";
+import axios from "../utils/axios";
 import "./BookPage.css";
 
 export default function BooksPage() {
     const [books, setBooks] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
-        fetchBooks();
+        let isMounted = true;
+        
+        const loadBooks = async () => {
+            try {
+                const res = await axios.get('/book/display');
+                
+                if (isMounted && Array.isArray(res.data)) {
+                    setBooks(res.data);
+                } else if (isMounted) {
+                    setBooks([]);
+                }
+            } catch (error) {
+                if (!isMounted) {
+                    return;
+                }
+                setBooks([]);
+            }
+        };
+        
+        loadBooks();
+        
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const fetchBooks = async () => {
         try {
-            const res = await axios.get(API_ENDPOINTS.BOOKS.DISPLAY);
-            setBooks(res.data);
+            const res = await axios.get('/book/display');
+            
+            if (Array.isArray(res.data)) {
+                setBooks(res.data);
+            } else {
+                setBooks([]);
+            }
         } catch (error) {
-            console.error("Không thể tải danh sách sách:", error);
+            setBooks([]);
         }
     };
 
-    const handleBorrow = async (bookId) => {
+    const openBorrowModal = (book) => {
         const token = localStorage.getItem("token");
         if (!token) {
             alert("Bạn cần đăng nhập trước!");
             return;
         }
+        setSelectedBook(book);
+        setQuantity(1);
+        setShowModal(true);
+    };
+
+    const closeBorrowModal = () => {
+        setShowModal(false);
+        setSelectedBook(null);
+        setQuantity(1);
+    };
+
+    const handleBorrow = async () => {
+        const token = localStorage.getItem("token");
+
+        if (!selectedBook || quantity < 1) {
+            alert("Vui lòng chọn số lượng hợp lệ!");
+            return;
+        }
+
+        if (quantity > selectedBook.availableCopies) {
+            alert(`Chỉ còn ${selectedBook.availableCopies} quyển!`);
+            return;
+        }
 
         try {
             await axios.post(
-                API_ENDPOINTS.BORROWS.CREATE,
-                { bookId },
+                '/borrow/create',
+                { 
+                    bookId: selectedBook.id,
+                    quantity: quantity
+                },
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            alert("Mượn thành công!");
+            
+            alert(`Mượn thành công ${quantity} quyển!`);
+            closeBorrowModal();
+            await fetchBooks();
         } catch (error) {
-            console.error("Borrow failed:", error.response?.data);
-            alert("Không thể đặt sách!");
+            const errorMsg = error.response?.data?.message || error.message || "Không thể mượn sách";
+            alert(`Lỗi: ${errorMsg}`);
         }
     };
 
@@ -49,12 +108,53 @@ export default function BooksPage() {
                     <div className="book-card" key={book.id}>
                         <h3>{book.title}</h3>
                         <p>Tác giả: {book.author || "Chưa có"}</p>
-                        <button onClick={() => handleBorrow(book.id)}>
-                            Mượn sách
+                        <p className={book.availableCopies <= 0 ? "out-of-stock" : ""}>
+                            Số lượng còn: {book.availableCopies ?? 0}
+                        </p>
+                        <button
+                            onClick={() => openBorrowModal(book)}
+                            disabled={book.availableCopies <= 0}
+                        >
+                            {book.availableCopies <= 0 ? "Hết sách" : "Mượn sách"}
                         </button>
                     </div>
                 ))}
             </div>
+
+            {showModal && selectedBook && (
+                <div className="modal-overlay" onClick={closeBorrowModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h3>Mượn sách: {selectedBook.title}</h3>
+                        <p>Số lượng còn lại: <strong>{selectedBook.availableCopies}</strong></p>
+                        
+                        <div className="quantity-selector">
+                            <label htmlFor="quantity-input">Số lượng mượn:</label>
+                            <input 
+                                id="quantity-input"
+                                type="number" 
+                                value={quantity}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value) || 1;
+                                    setQuantity(Math.max(1, Math.min(selectedBook.availableCopies, value)));
+                                }}
+                                min="1"
+                                max={selectedBook.availableCopies}
+                                className="quantity-input"
+                                placeholder={`Nhập từ 1 đến ${selectedBook.availableCopies}`}
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <button onClick={handleBorrow} className="btn-confirm">
+                                Xác nhận mượn
+                            </button>
+                            <button onClick={closeBorrowModal} className="btn-cancel">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
